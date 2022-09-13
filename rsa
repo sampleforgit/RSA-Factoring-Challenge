@@ -1,91 +1,95 @@
-#!/usr/bin/python3
-
-""" Class factor_file """
-
-from sys import argv
-
-from math import sqrt
+#!/usr/bin/env bash
 
 
 
+check_factor()
 
+{
 
-class factor_file:
+	if [ $# -ne 3 ];
 
-    """ init """
+        then
 
-    def __init__(self, filename):
+                args=("$@")
 
-        """check if
+                count=0
 
-        file is not NULL
+                num2=1
 
-        """
+                for a in ${args[*]};
 
-        if filename is not None:
+                do
 
-            self.filename = filename
+                        if [ $count -gt 1 ];
 
+                        then
 
+                                num2=$(echo $a*$num2 | bc)
 
-    def open_read_file(self):
+                        fi
 
-        """read from file
+                        count=$((count + 1))
 
-        add to array
+                done
 
-        """
+        else
 
-        with open(self.filename, encoding="utf-8") as file:
+                num2=$3
 
-            lines = file.readlines()
-
-        number_to_factor = []
-
-        for line in lines:
-
-            number_to_factor.append(int(line))
-
-        return number_to_factor
+        fi
 
 
 
-    def factorial(self, n):
+        num1=$2
 
-        """factor each
-
-        n given
-
-        """
-
-        for i in range(2, n):
-
-            if n == ((n // i) * i):
-
-                print("{}={}*{}".format(n, (n // i), i))
-
-                break
+        num=$(echo "$1" | tr ':' '=')
 
 
 
-    def factor_each_n_in_lis(self):
+        result=$(echo "if($num2 > $num1) 1 else 0" | bc)
 
-        """factor each
+	        if ((result == 1)); then
 
-        num in ls
+		        numcp=$num1
 
-        """
+		        num1=$num2
 
-        ls = self.open_read_file()
+		        num2=$numcp
 
-        for n in ls:
-
-            self.factorial(n)
+                fi
 
 
 
+        echo "$num$num1*$num2"
+
+}
 
 
-for i in range(1, len(argv)):
 
-    factor_file(argv[i]).factor_each_n_in_lis()
+if [ $# -ne 1 ]
+
+then
+
+        echo 'Usage: rsa <file>'
+
+        exit 1
+
+else
+
+
+
+        while read i
+
+        do
+
+
+
+                result=$(factor "$i")
+
+                check_factor $result
+
+
+
+        done < "$1"
+
+fi
